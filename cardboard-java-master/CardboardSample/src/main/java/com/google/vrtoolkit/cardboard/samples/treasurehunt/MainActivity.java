@@ -262,7 +262,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         textureVerticesBuffer.position(0);
 
         int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.vertex);
-        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.greyscale_fragment);
+        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.toonify_fragment);
 
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
