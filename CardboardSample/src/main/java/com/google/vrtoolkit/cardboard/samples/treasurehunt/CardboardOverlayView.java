@@ -30,49 +30,47 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-/**
- * Contains two sub-views to provide a simple stereo HUD.
- */
 public class CardboardOverlayView extends LinearLayout {
-  private final CardboardOverlayEyeView leftView;
-  private final CardboardOverlayEyeView rightView;
-  private AlphaAnimation textFadeAnimation;
+  private static final String TAG = CardboardOverlayView.class.getSimpleName();
+  private final CardboardOverlayEyeView mLeftView;
+  private final CardboardOverlayEyeView mRightView;
+  private AlphaAnimation mTextFadeAnimation;
 
   public CardboardOverlayView(Context context, AttributeSet attrs) {
     super(context, attrs);
     setOrientation(HORIZONTAL);
 
     LayoutParams params = new LayoutParams(
-      LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1.0f);
+            LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, 1.0f);
     params.setMargins(0, 0, 0, 0);
 
-    leftView = new CardboardOverlayEyeView(context, attrs);
-    leftView.setLayoutParams(params);
-    addView(leftView);
+    mLeftView = new CardboardOverlayEyeView(context, attrs);
+    mLeftView.setLayoutParams(params);
+    addView(mLeftView);
 
-    rightView = new CardboardOverlayEyeView(context, attrs);
-    rightView.setLayoutParams(params);
-    addView(rightView);
+    mRightView = new CardboardOverlayEyeView(context, attrs);
+    mRightView.setLayoutParams(params);
+    addView(mRightView);
 
     // Set some reasonable defaults.
-    setDepthOffset(0.01f);
+    setDepthOffset(0.016f);
     setColor(Color.rgb(150, 255, 180));
     setVisibility(View.VISIBLE);
 
-    textFadeAnimation = new AlphaAnimation(1.0f, 0.0f);
-    textFadeAnimation.setDuration(5000);
+    mTextFadeAnimation = new AlphaAnimation(1.0f, 0.0f);
+    mTextFadeAnimation.setDuration(5000);
   }
 
   public void show3DToast(String message) {
     setText(message);
     setTextAlpha(1f);
-    textFadeAnimation.setAnimationListener(new EndAnimationListener() {
+    mTextFadeAnimation.setAnimationListener(new EndAnimationListener() {
       @Override
       public void onAnimationEnd(Animation animation) {
         setTextAlpha(0f);
       }
     });
-    startAnimation(textFadeAnimation);
+    startAnimation(mTextFadeAnimation);
   }
 
   private abstract class EndAnimationListener implements Animation.AnimationListener {
@@ -81,30 +79,30 @@ public class CardboardOverlayView extends LinearLayout {
   }
 
   private void setDepthOffset(float offset) {
-    leftView.setOffset(offset);
-    rightView.setOffset(-offset);
+    mLeftView.setOffset(offset);
+    mRightView.setOffset(-offset);
   }
 
   private void setText(String text) {
-    leftView.setText(text);
-    rightView.setText(text);
+    mLeftView.setText(text);
+    mRightView.setText(text);
   }
 
   private void setTextAlpha(float alpha) {
-    leftView.setTextViewAlpha(alpha);
-    rightView.setTextViewAlpha(alpha);
+    mLeftView.setTextViewAlpha(alpha);
+    mRightView.setTextViewAlpha(alpha);
   }
 
   private void setColor(int color) {
-    leftView.setColor(color);
-    rightView.setColor(color);
+    mLeftView.setColor(color);
+    mRightView.setColor(color);
   }
 
   /**
    * A simple view group containing some horizontally centered text underneath a horizontally
    * centered image.
    *
-   * <p>This is a helper class for CardboardOverlayView.
+   * This is a helper class for CardboardOverlayView.
    */
   private class CardboardOverlayEyeView extends ViewGroup {
     private final ImageView imageView;
@@ -149,38 +147,32 @@ public class CardboardOverlayView extends LinearLayout {
       final int width = right - left;
       final int height = bottom - top;
 
-      // The size of the image, given as a fraction of the dimension as a ViewGroup.
-      // We multiply both width and heading with this number to compute the image's bounding
-      // box. Inside the box, the image is the horizontally and vertically centered.
-      final float imageSize = 0.1f;
+      // The size of the image, given as a fraction of the dimension as a ViewGroup. We multiply
+      // both width and heading with this number to compute the image's bounding box. Inside the
+      // box, the image is the horizontally and vertically centered.
+      final float imageSize = 0.12f;
 
-      // The fraction of this ViewGroup's height by which we shift the image off the
-      // ViewGroup's center. Positive values shift downwards, negative values shift upwards.
+      // The fraction of this ViewGroup's height by which we shift the image off the ViewGroup's
+      // center. Positive values shift downwards, negative values shift upwards.
       final float verticalImageOffset = -0.07f;
 
       // Vertical position of the text, specified in fractions of this ViewGroup's height.
       final float verticalTextPos = 0.52f;
 
       // Layout ImageView
-      float adjustedOffset = offset;
-      // If the half screen width is bigger than 1000 pixels, that means it's a big screen
-      // phone and we need to use a different offset value.
-      if (width > 1000) {
-        adjustedOffset = 3.8f * offset;
-      }
       float imageMargin = (1.0f - imageSize) / 2.0f;
-      float leftMargin = (int) (width * (imageMargin + adjustedOffset));
+      float leftMargin = (int) (width * (imageMargin + offset));
       float topMargin = (int) (height * (imageMargin + verticalImageOffset));
       imageView.layout(
-        (int) leftMargin, (int) topMargin,
-        (int) (leftMargin + width * imageSize), (int) (topMargin + height * imageSize));
+              (int) leftMargin, (int) topMargin,
+              (int) (leftMargin + width * imageSize), (int) (topMargin + height * imageSize));
 
       // Layout TextView
-      leftMargin = adjustedOffset * width;
+      leftMargin = offset * width;
       topMargin = height * verticalTextPos;
       textView.layout(
-        (int) leftMargin, (int) topMargin,
-        (int) (leftMargin + width), (int) (topMargin + height * (1.0f - verticalTextPos)));
+              (int) leftMargin, (int) topMargin,
+              (int) (leftMargin + width), (int) (topMargin + height * (1.0f - verticalTextPos)));
     }
   }
 }
