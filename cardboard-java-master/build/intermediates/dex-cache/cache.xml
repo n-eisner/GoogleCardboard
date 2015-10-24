@@ -2,6 +2,7 @@
 <items version="2" >
 
     <item
+<<<<<<< HEAD
         jar="/Users/demouser/AndroidStudioProjects/GoogleCardboard/cardboard-java-master/CardboardSample/libs/cardboard.jar"
         jumboMode="false"
         revision="19.1.0"
@@ -14,6 +15,20 @@
         revision="19.1.0"
         sha1="2ba3ce68542db5a4b672a22606e4fd4631ed5c4f">
         <dex dex="/Users/demouser/AndroidStudioProjects/GoogleCardboard/cardboard-java-master/CardboardSample/build/intermediates/pre-dexed/debug/libprotobuf-java-2.6-nano-53ca13a4c8f1f8d10989de2a633d66a97b9a5014.jar" />
+=======
+        jar="/Users/natalieeisner/Documents/GoogleHack/CurrentProject/cardboard-java-master/CardboardSample/libs/libprotobuf-java-2.6-nano.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="2ba3ce68542db5a4b672a22606e4fd4631ed5c4f">
+        <dex dex="/Users/natalieeisner/Documents/GoogleHack/CurrentProject/cardboard-java-master/CardboardSample/build/intermediates/pre-dexed/debug/libprotobuf-java-2.6-nano-f149e7d2dcaceb19774d05d1a1d259b92efeaf7a.jar" />
+    </item>
+    <item
+        jar="/Users/natalieeisner/Documents/GoogleHack/CurrentProject/cardboard-java-master/CardboardSample/libs/cardboard.jar"
+        jumboMode="false"
+        revision="19.1.0"
+        sha1="46968b334ac4df75265086808d1745ac3f37c97d">
+        <dex dex="/Users/natalieeisner/Documents/GoogleHack/CurrentProject/cardboard-java-master/CardboardSample/build/intermediates/pre-dexed/debug/cardboard-a7c099fd3646fd95d8c33dc879c1e432ed21f958.jar" />
+>>>>>>> 6f401390803548cf428596b5ebd78f36df2f81f2
     </item>
 
 </items>

@@ -40,7 +40,8 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MainActivity extends CardboardActivity implements CardboardView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener {
-
+    public int change = 0;
+    public int numFilters = 0;
     private static final String TAG = "VRCamMtMMainAc";
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
     private Camera camera;
@@ -62,7 +63,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                     "uniform samplerExternalOES s_texture;               \n" +
                     "void main(void) {" +
                     "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
-                    "  gl_FragColor.r = 0.0\n;" +
+                    getTriggeredFilter() +
                     //"  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n" +
                     "}";
 
@@ -329,9 +330,14 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
     @Override
     public void onCardboardTrigger() {
-
+        change++;
+        change = change % numFilters;
     }
 
+    private String getTriggeredFilter() {
+        String[] filters = {"  gl_FragColor.r = 1.0\n;"};
+        return filters[change];
+    }
 
 }
 

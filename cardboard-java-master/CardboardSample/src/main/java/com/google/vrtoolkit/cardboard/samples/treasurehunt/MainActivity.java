@@ -1,6 +1,5 @@
 /*
  * Copyright 2014 Google Inc. All Rights Reserved.
-
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -43,6 +42,9 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MainActivity extends CardboardActivity implements CardboardView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener {
+    public int currentFilter = 0;
+    int[] filterFiles = { R.raw.greyscale_fragment, R.raw.pass_through, R.raw.red_green_fragment};
+    public int numFilters = filterFiles.length;
 
     private static final String TAG = "VRCamMtMMainAc";
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
@@ -97,7 +99,6 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         // Check what resolutions are supported by your camera
     /*List<Camera.Size> sizes = params.getSupportedPictureSizes();
-
     // Iterate through all available resolutions and choose one.
     // The chosen resolution will be stored in mSize.
     Camera.Size mSize = null;
@@ -232,6 +233,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         Log.i(TAG, "onSurfaceChanged");
     }
 
+
     /**
      * Creates the buffers we use to store information about the 3D world. OpenGL doesn't use Java
      * arrays, but rather needs data in a format it can understand. Hence we use ByteBuffers.
@@ -261,13 +263,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         textureVerticesBuffer.put(textureVertices);
         textureVerticesBuffer.position(0);
 
-        int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.vertex);
-        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.toonify_fragment);
-
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);
 
         texture = createTexture();
         startCamera(texture);
@@ -292,6 +288,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         this.cardboardView.requestRender();
     }
 
+    private int fragmentShader;
+    private int vertexShader;
+    private int lastFilter = -1;
+
     /**
      * Draws a frame for an eye.
      *
@@ -300,6 +300,26 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     @Override
     public void onDrawEye(Eye eye) {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+
+        if (lastFilter != currentFilter) {
+            if (lastFilter != -1) {
+                GLES20.glDetachShader(mProgram, fragmentShader);
+                GLES20.glDetachShader(mProgram, vertexShader);
+                GLES20.glDeleteShader(fragmentShader);
+                GLES20.glDeleteShader(vertexShader);
+
+            }
+
+            Log.i(TAG, "lastFilter != currentFilter");
+            fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, filterFiles[currentFilter]);
+            vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.vertex);
+
+            GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
+            GLES20.glAttachShader(mProgram, vertexShader); // add the fragment shader to program
+            GLES20.glLinkProgram(mProgram);
+            lastFilter = currentFilter;
+        }
 
         GLES20.glUseProgram(mProgram);
 
@@ -339,9 +359,10 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
     @Override
     public void onCardboardTrigger() {
-
+        currentFilter++;
+        currentFilter = currentFilter % numFilters;
+        Log.i(TAG, "onCardboardTrigger");
     }
 
 
 }
-
