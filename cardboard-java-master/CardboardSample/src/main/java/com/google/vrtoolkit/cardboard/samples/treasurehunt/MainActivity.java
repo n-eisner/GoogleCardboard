@@ -30,7 +30,10 @@ import com.google.vrtoolkit.cardboard.Eye;
 import com.google.vrtoolkit.cardboard.HeadTransform;
 import com.google.vrtoolkit.cardboard.Viewport;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -45,33 +48,12 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
     private Camera camera;
 
-    private final String vertexShaderCode =
-            "attribute vec4 position;" +
-                    "attribute vec2 inputTextureCoordinate;" +
-                    "varying vec2 textureCoordinate;" +
-                    "void main()" +
-                    "{" +
-                    "gl_Position = position;" +
-                    "textureCoordinate = inputTextureCoordinate;" +
-                    "}";
-
-    private final String fragmentShaderCode =
-            "#extension GL_OES_EGL_image_external : require\n" +
-                    "precision mediump float;" +
-                    "varying vec2 textureCoordinate;                            \n" +
-                    "uniform samplerExternalOES s_texture;               \n" +
-                    "void main(void) {" +
-                    "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
-                    //"  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n" +
-                    "}";
-
     private FloatBuffer vertexBuffer, textureVerticesBuffer, vertexBuffer2;
     private ShortBuffer drawListBuffer, buf2;
     private int mProgram;
     private int mPositionHandle, mPositionHandle2;
     private int mColorHandle;
     private int mTextureCoordHandle;
-
 
     // number of coordinates per vertex in this array
     static final int COORDS_PER_VERTEX = 2;
@@ -152,9 +134,38 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
         return texture[0];
     }
+    /**
+     * Converts a raw text file into a string.
+     *
+     * @param resId The resource ID of the raw text file about to be turned into a shader.
+     * @return The context of the text file, or null in case of error.
+     */
+    private String readRawTextFile(int resId) {
+        InputStream inputStream = getResources().openRawResource(resId);
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            reader.close();
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-
-    private int loadGLShader(int type, String code) {
+    /**
+     * Converts a raw text file, saved as a resource, into an OpenGL ES shader.
+     *
+     * @param type The type of shader we will be creating.
+     * @param resId The resource ID of the raw text file about to be turned into a shader.
+     * @return The shader object handler.
+     */
+    private int loadGLShader(int type, int resId) {
+        String code = readRawTextFile(resId);
         int shader = GLES20.glCreateShader(type);
         GLES20.glShaderSource(shader, code);
         GLES20.glCompileShader(shader);
@@ -250,8 +261,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         textureVerticesBuffer.put(textureVertices);
         textureVerticesBuffer.position(0);
 
-        int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.vertex);
+        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.greyscale_fragment);
 
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
