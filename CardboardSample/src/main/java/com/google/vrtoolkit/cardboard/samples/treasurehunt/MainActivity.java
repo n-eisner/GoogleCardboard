@@ -62,6 +62,7 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
                     "uniform samplerExternalOES s_texture;               \n" +
                     "void main(void) {" +
                     "  gl_FragColor = texture2D( s_texture, textureCoordinate );\n" +
+                    "  gl_FragColor.r = 0.0\n;" +
                     //"  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n" +
                     "}";
 
