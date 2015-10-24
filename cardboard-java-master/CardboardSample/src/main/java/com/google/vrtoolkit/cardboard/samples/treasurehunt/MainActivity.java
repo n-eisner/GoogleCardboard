@@ -43,6 +43,9 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class MainActivity extends CardboardActivity implements CardboardView.StereoRenderer, SurfaceTexture.OnFrameAvailableListener {
+    public int currentFilter = 0;
+    public int numFilters = 5;
+    int[] filterFiles = { R.raw.pass_through, R.raw.greyscale_fragment, R.raw.grid_fragment, R.raw.light_vertex, R.raw.vertex};
 
     private static final String TAG = "VRCamMtMMainAc";
     private static final int GL_TEXTURE_EXTERNAL_OES = 0x8D65;
@@ -262,7 +265,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
         textureVerticesBuffer.position(0);
 
         int vertexShader = loadGLShader(GLES20.GL_VERTEX_SHADER, R.raw.vertex);
-        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, R.raw.greyscale_fragment);
+
+        int fragmentShader = loadGLShader(GLES20.GL_FRAGMENT_SHADER, filterFiles[currentFilter]);
 
         mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
         GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
@@ -339,7 +343,8 @@ public class MainActivity extends CardboardActivity implements CardboardView.Ste
 
     @Override
     public void onCardboardTrigger() {
-
+        currentFilter++;
+        currentFilter = currentFilter % numFilters;
     }
 
 
